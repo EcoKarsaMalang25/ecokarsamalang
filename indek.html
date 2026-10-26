@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoKarsa Malang - Tas Ramah Lingkungan & Stylis</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sage: {
+                            50: '#f4f7f4',
+                            100: '#e3ebe3',
+                            500: '#4A7C59',
+                            700: '#2D5A27',
+                            900: '#1a3818',
+                        },
+                        terracotta: {
+                            500: '#C86D51',
+                            600: '#b2593f',
+                        },
+                        cream: '#F9F8F6',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F9F8F6;
+            color: #2D3748;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F9F8F6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4A7C59;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2D5A27;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-sage-500 selection:text-white min-h-screen flex flex-col justify-between">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-sage-700 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 pointer-events-none">
+        <i class="fas fa-check-circle text-xl text-green-300"></i>
+        <span id="toast-message" class="text-sm font-semibold">Produk berhasil ditambahkan!</span>
+    </div>
+
+    <!-- HEADER / NAVBAR -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-sm transition-all duration-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="scrollToSection('hero')">
+                    <div class="w-10 h-10 rounded-full bg-sage-700 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                        <i class="fas fa-leaf text-sage-100"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight text-sage-700 block leading-none">EcoKarsa</span>
+                        <span class="text-xs font-semibold tracking-wider text-terracotta-500 block">MALANG</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-8 font-medium text-gray-700">
+                    <button onclick="scrollToSection('hero')" class="hover:text-sage-700 transition">Beranda</button>
+                    <button onclick="scrollToSection('katalog')" class="hover:text-sage-700 transition">Katalog Tas</button>
+                    <button onclick="scrollToSection('keunggulan')" class="hover:text-sage-700 transition">Keunggulan</button>
+                    <button onclick="scrollToSection('cara-order')" class="hover:text-sage-700 transition">Cara Order</button>
+                    <button onclick="scrollToSection('kontak')" class="hover:text-sage-700 transition">Kontak</button>
+                </nav>
+
+                <!-- Search & Cart Icon -->
+                <div class="flex items-center space-x-4">
+                    <!-- Search Bar Simple -->
+                    <div class="relative hidden sm:block">
+                        <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Cari tas impian..." class="w-44 md:w-60 pl-9 pr-4 py-2 text-sm bg-gray-100 border border-transparent rounded-full focus:outline-none focus:bg-white focus:border-sage-500 transition">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+                    </div>
+
+                    <!-- Cart Button -->
+                    <button onclick="toggleCartDrawer()" class="relative p-2 text-gray-700 hover:text-sage-700 transition focus:outline-none" aria-label="Keranjang Belanja">
+                        <i class="fas fa-shopping-bag text-2xl"></i>
+                        <span id="cartBadge" class="absolute -top-1 -right-1 bg-terracotta-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-md">0</span>
+                    </button>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-700 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-gray-200 px-4 pt-2 pb-4 space-y-2">
+            <div class="mb-3">
+                <input type="text" id="searchInputMobile" onkeyup="filterProductsMobile()" placeholder="Cari tas..." class="w-full pl-9 pr-4 py-2 text-sm bg-gray-100 border border-transparent rounded-full focus:outline-none focus:bg-white focus:border-sage-500">
+            </div>
+            <button onclick="scrollToSection('hero'); toggleMobileMenu()" class="block w-full text-left py-2 px-3 rounded-md font-medium text-gray-700 hover:bg-sage-50 hover:text-sage-700">Beranda</button>
+            <button onclick="scrollToSection('katalog'); toggleMobileMenu()" class="block w-full text-left py-2 px-3 rounded-md font-medium text-gray-700 hover:bg-sage-50 hover:text-sage-700">Katalog Tas</button>
+            <button onclick="scrollToSection('keunggulan'); toggleMobileMenu()" class="block w-full text-left py-2 px-3 rounded-md font-medium text-gray-700 hover:bg-sage-50 hover:text-sage-700">Keunggulan</button>
+            <button onclick="scrollToSection('cara-order'); toggleMobileMenu()" class="block w-full text-left py-2 px-3 rounded-md font-medium text-gray-700 hover:bg-sage-50 hover:text-sage-700">Cara Order</button>
+            <button onclick="scrollToSection('kontak'); toggleMobileMenu()" class="block w-full text-left py-2 px-3 rounded-md font-medium text-gray-700 hover:bg-sage-50 hover:text-sage-700">Kontak</button>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section id="hero" class="relative overflow-hidden pt-8 pb-16 md:py-24 bg-gradient-to-b from-white to-cream">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <!-- Text Content -->
+                <div class="space-y-6 text-center md:text-left">
+                    <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-sage-100 text-sage-700 border border-sage-500/20">
+                        <i class="fas fa-seedling"></i> 100% Khusus Tas Ramah Lingkungan
+                    </span>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 leading-tight">
+                        Gaya Modis & Sustainable, <span class="text-sage-700">Harga Terjangkau</span>
+                    </h1>
+                    <p class="text-base sm:text-lg text-gray-600 max-w-xl mx-auto md:mx-0">
+                        Pilihan tepat untuk gaya hidup eco-friendly Anda. Koleksi tas berbahan <strong>daur ulang premium</strong> & <strong>kulit sintetis (vegan leather)</strong> berkualias buatan lokal Malang.
+                    </p>
+                    <div class="pt-2 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                        <button onclick="scrollToSection('katalog')" class="px-8 py-3.5 bg-sage-700 hover:bg-sage-900 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                            <span>Lihat Katalog</span>
+                            <i class="fas fa-arrow-right text-sm"></i>
+                        </button>
+                        <button onclick="scrollToSection('keunggulan')" class="px-8 py-3.5 bg-white border border-gray-300 text-gray-700 font-semibold rounded-full hover:bg-gray-50 transition shadow-sm flex items-center justify-center">
+                            Mengapa EcoKarsa?
+                        </button>
+                    </div>
+                    <!-- Micro Stats -->
+                    <div class="pt-6 border-t border-gray-200 grid grid-cols-3 gap-4 max-w-md mx-auto md:mx-0 text-center md:text-left">
+                        <div>
+                            <p class="text-2xl font-bold text-sage-700">Rp 45rb+</p>
+                            <p class="text-xs text-gray-500">Harga Terjangkau</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-sage-700">100%</p>
+                            <p class="text-xs text-gray-500">Khusus Produk Tas</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-terracotta-500">Malang</p>
+                            <p class="text-xs text-gray-500">Pengrajin Lokal</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Banner Image / Visual -->
+                <div class="relative">
+                    <div class="relative mx-auto max-w-md lg:max-w-none">
+                        <div class="aspect-w-4 aspect-h-3 rounded-3xl overflow-hidden shadow-2xl bg-gray-200 border-4 border-white">
+                            <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=800" alt="EcoKarsa Canvas Bag" class="w-full h-[400px] object-cover">
+                        </div>
+                        <!-- Floating Badge -->
+                        <div class="absolute -bottom-6 -left-4 sm:left-6 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-3 border border-gray-100">
+                            <div class="w-12 h-12 rounded-xl bg-terracotta-500 text-white flex items-center justify-center text-xl">
+                                <i class="fas fa-recycle"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 font-medium">Material Pilihan</p>
+                                <p class="text-sm font-bold text-gray-800">Recycled & Synthetic</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION KATALOG -->
+    <section id="katalog" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-terracotta-500 font-bold tracking-wider uppercase text-xs">Katalog Resmi</span>
+                <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl mt-1">Pilihan Tas Terbaik Untuk Anda</h2>
+                <p class="text-gray-600 mt-2">100% Hanya menjual tas berbahan ramah lingkungan dan kulit imitasi elegan dengan harga bersahabat.</p>
+            </div>
+
+            <!-- FILTER & SORT BAR -->
+            <div class="bg-cream p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-200/60 mb-8 space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <!-- Filter Bahan -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider mr-2">Bahan:</span>
+                        <button onclick="setFilterBahan('all')" id="btn-bahan-all" class="filter-btn-bahan px-4 py-1.5 rounded-full text-xs font-semibold bg-sage-700 text-white shadow-sm">Semua</button>
+                        <button onclick="setFilterBahan('daur-ulang')" id="btn-bahan-daur-ulang" class="filter-btn-bahan px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-gray-700 hover:bg-sage-100 transition border border-gray-200">Daur Ulang</button>
+                        <button onclick="setFilterBahan('imitasi')" id="btn-bahan-imitasi" class="filter-btn-bahan px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-gray-700 hover:bg-sage-100 transition border border-gray-200">Kulit Imitasi</button>
+                    </div>
+
+                    <!-- Filter Jenis -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider mr-2">Jenis:</span>
+                        <select id="selectJenis" onchange="applyFilters()" class="text-xs font-semibold py-2 px-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-500">
+                            <option value="all">Semua Jenis Tas</option>
+                            <option value="ransel">Tas Ransel</option>
+                            <option value="tote">Tote Bag</option>
+                            <option value="sling">Tas Selempang (Sling Bag)</option>
+                            <option value="clutch">Clutch / Handbag</option>
+                        </select>
+                    </div>
+
+                    <!-- Sortir Harga -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Urutkan:</span>
+                        <select id="selectSort" onchange="applyFilters()" class="text-xs font-semibold py-2 px-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-500">
+                            <option value="default">Rekomendasi</option>
+                            <option value="low-high">Harga: Terendah ke Tertinggi</option>
+                            <option value="high-low">Harga: Tertinggi ke Terendah</option>
+                            <option value="rating">Rating Tertinggi</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRID KATALOG PRODUK -->
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Product Items injected by JS -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden text-center py-16">
+                <i class="fas fa-shopping-bag text-5xl text-gray-300 mb-3"></i>
+                <p class="text-lg font-semibold text-gray-600">Tas tidak ditemukan</p>
+                <p class="text-sm text-gray-400">Coba ubah kata kunci atau kata filter Anda.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION KEUNGGULAN -->
+    <section id="keunggulan" class="py-16 bg-cream">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-sage-700 font-bold tracking-wider uppercase text-xs">Nilai Lebih</span>
+                <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl mt-1">Mengapa Memilih EcoKarsa Malang?</h2>
+                <p class="text-gray-600 mt-2">Kombinasi antara tanggung jawab lingkungan, estetika modern, dan kepedulian lokal.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-sage-100 text-sage-700 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-5">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">100% Eco-Conscious</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Menggunakan kain daur ulang berkualitas (spanduk, botol plastik terolah) dan Kulit Sintetis / Vegan Leather tanpa menyakiti hewan.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-terracotta-50 text-terracotta-500 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-5">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Pengrajin Lokal Malang</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Dibuat langsung oleh tangan-tangan kreatif UMKM Malang. Pembelian Anda berdampak langsung bagi perekonomian lokal.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-sage-100 text-sage-700 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-5">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Harga Sangat Terjangkau</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Mulai dari Rp 45.000 hingga Rp 180.000 saja. Siapapun bisa bergaya trendi sekaligus menjaga kelestarian bumi.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION CARA ORDER -->
+    <section id="cara-order" class="py-16 bg-white border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-terracotta-500 font-bold tracking-wider uppercase text-xs">Mudah & Cepat</span>
+                <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl mt-1">Cara Pemesanan Bagis Anda</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+                <div class="p-4">
+                    <div class="w-12 h-12 bg-sage-700 text-white rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4">1</div>
+                    <h4 class="font-bold text-gray-800 mb-1">Pilih Tas</h4>
+                    <p class="text-xs text-gray-500">Pilih tas pilihan Anda di katalog online kami.</p>
+                </div>
+                <div class="p-4">
+                    <div class="w-12 h-12 bg-sage-700 text-white rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4">2</div>
+                    <h4 class="font-bold text-gray-800 mb-1">Masuk Keranjang</h4>
+                    <p class="text-xs text-gray-500">Klik "Tambah ke Keranjang" dan cek pesanan Anda.</p>
+                </div>
+                <div class="p-4">
+                    <div class="w-12 h-12 bg-sage-700 text-white rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4">3</div>
+                    <h4 class="font-bold text-gray-800 mb-1">Isi Data Alamat</h4>
+                    <p class="text-xs text-gray-500">Lengkapi formulir checkout sederhana di drawer keranjang.</p>
+                </div>
+                <div class="p-4">
+                    <div class="w-12 h-12 bg-sage-700 text-white rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4">4</div>
+                    <h4 class="font-bold text-gray-800 mb-1">Kirim via WhatsApp</h4>
+                    <p class="text-xs text-gray-500">Sistem otomatis meneruskan pesanan Anda ke WhatsApp Admin EcoKarsa.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER & KONTAK -->
+    <footer id="kontak" class="bg-sage-900 text-white pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-sage-700">
+                <!-- Brand Info -->
+                <div class="space-y-4 md:col-span-1">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-sage-900 font-bold text-lg">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <span class="text-xl font-bold tracking-tight">EcoKarsa Malang</span>
+                    </div>
+                    <p class="text-sm text-sage-100 leading-relaxed">
+                        Brand lokal khusus tas berbahan daur ulang dan kulit imitasi berkualitas di Kota Malang. Tampil gaya tanpa merusak alam.
+                    </p>
+                </div>
+
+                <!-- Navigation Quick links -->
+                <div>
+                    <h4 class="text-base font-semibold mb-4 text-white">Navigasi</h4>
+                    <ul class="space-y-2 text-sm text-sage-100">
+                        <li><a href="#hero" class="hover:text-white transition">Beranda</a></li>
+                        <li><a href="#katalog" class="hover:text-white transition">Katalog Produk</a></li>
+                        <li><a href="#keunggulan" class="hover:text-white transition">Keunggulan Kami</a></li>
+                        <li><a href="#cara-order" class="hover:text-white transition">Panduan Order</a></li>
+                    </ul>
+                </div>
+
+                <!-- Operational Info -->
+                <div>
+                    <h4 class="text-base font-semibold mb-4 text-white">Jam Operasional</h4>
+                    <p class="text-sm text-sage-100 mb-2">Senin - Sabtu: 08.00 - 17.00 WIB</p>
+                    <p class="text-sm text-sage-100">Pengiriman dari Kota Malang, Jawa Timur</p>
+                </div>
+
+                <!-- Contact & Social -->
+                <div>
+                    <h4 class="text-base font-semibold mb-4 text-white">Kontak Malang</h4>
+                    <ul class="space-y-3 text-sm text-sage-100">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-map-marker-alt text-terracotta-500 mt-1"></i>
+                            <span>Jl. Soekarno Hatta No. 45, Lowokwaru, Kota Malang, Jawa Timur</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fab fa-whatsapp text-green-400"></i>
+                            <span>+62 812-3456-7890</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-envelope text-terracotta-500"></i>
+                            <span>halo@ecokarsamalang.com</span>
+                        </li>
+                    </ul>
+                    <div class="flex space-x-3 mt-4">
+                        <a href="#" class="w-8 h-8 rounded-full bg-sage-700 flex items-center justify-center text-white hover:bg-terracotta-500 transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-sage-700 flex items-center justify-center text-white hover:bg-terracotta-500 transition"><i class="fab fa-tiktok"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-sage-700 flex items-center justify-center text-white hover:bg-terracotta-500 transition"><i class="fab fa-facebook-f"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-8 text-center text-xs text-sage-100">
+                <p>&copy; 2026 EcoKarsa Malang. Seluruh hak cipta dilindungi. Spesialis Tas Daur Ulang & Vegan Leather.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL DETAIL PRODUK -->
+    <div id="productModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl relative transform transition-all">
+            <!-- Close Button -->
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center justify-center transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                <!-- Image Container -->
+                <div class="h-64 md:h-full bg-gray-100 relative">
+                    <img id="modalImg" src="" alt="Detail Tas" class="w-full h-full object-cover">
+                    <span id="modalBadge" class="absolute top-4 left-4 text-xs font-bold px-3 py-1 rounded-full text-white"></span>
+                </div>
+
+                <!-- Modal Content -->
+                <div class="p-6 md:p-8 flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span id="modalCategory" class="text-xs font-bold uppercase tracking-wider text-sage-700"></span>
+                            <div class="flex items-center text-yellow-400 text-xs gap-1" id="modalRating"></div>
+                        </div>
+                        <h3 id="modalTitle" class="text-2xl font-bold text-gray-900 mb-2"></h3>
+                        <p id="modalPrice" class="text-xl font-extrabold text-terracotta-500 mb-4"></p>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <h4 class="text-xs font-bold text-gray-500 uppercase">Cerita Bahan & Sustainability</h4>
+                                <p id="modalMaterialStory" class="text-xs text-gray-600 mt-1 leading-relaxed bg-sage-50 p-3 rounded-xl border border-sage-100"></p>
+                            </div>
+
+                            <div>
+                                <h4 class="text-xs font-bold text-gray-500 uppercase">Spesifikasi Ukuran</h4>
+                                <p id="modalSpecs" class="text-xs text-gray-600 mt-1"></p>
+                            </div>
+
+                            <div>
+                                <h4 class="text-xs font-bold text-gray-500 uppercase">Varian Warna Available</h4>
+                                <div id="modalColors" class="flex gap-2 mt-1"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-100">
+                        <button id="modalAddToCartBtn" class="w-full py-3 bg-sage-700 hover:bg-sage-900 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                            <i class="fas fa-cart-plus"></i>
+                            <span>Tambah ke Keranjang</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DRAWER KERANJANG BELANJA -->
+    <div id="cartDrawerOverlay" onclick="toggleCartDrawer()" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    <div id="cartDrawer" class="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col justify-between">
+        <!-- Header Cart -->
+        <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-cream">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-shopping-bag text-sage-700 text-xl"></i>
+                <h3 class="font-bold text-gray-800 text-lg">Keranjang Belanja</h3>
+            </div>
+            <button onclick="toggleCartDrawer()" class="p-2 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Cart Items List -->
+        <div id="cartItemsContainer" class="p-5 flex-1 overflow-y-auto space-y-4">
+            <!-- Items injected by JS -->
+        </div>
+
+        <!-- Checkout Form & Summary -->
+        <div class="p-5 border-t border-gray-200 bg-white space-y-4">
+            <div class="space-y-1">
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Subtotal:</span>
+                    <span id="cartSubtotal" class="font-semibold">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Estimasi Ongkir (Kota Malang & Sekitar):</span>
+                    <span class="text-xs text-sage-700 font-semibold">Dihitung di WA</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold text-gray-900 pt-2 border-t border-gray-100">
+                    <span>Total Tagihan:</span>
+                    <span id="cartTotal" class="text-terracotta-500">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- Checkout Form -->
+            <form id="checkoutForm" onsubmit="handleCheckout(event)" class="space-y-3 pt-2">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="custName" required placeholder="Contoh: Budi Santoso" class="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-sage-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Alamat Pengiriman (Malang / Luar Kota)</label>
+                    <textarea id="custAddress" required rows="2" placeholder="Jl. Mawar No 12, Lowokwaru, Malang..." class="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-sage-500 focus:outline-none"></textarea>
+                </div>
+                <button type="submit" id="checkoutBtn" class="w-full py-3.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                    <i class="fab fa-whatsapp text-xl"></i>
+                    <span>Pesan Sekarang via WhatsApp</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // DATA KATALOG TAS LENGKAP
+        const products = [
+            {
+                id: 1,
+                name: "Eco Totebag Bening Recycled",
+                category: "tote",
+                bahanType: "daur-ulang",
+                bahanLabel: "Daur Ulang",
+                materialStory: "Dibuat dari 80% botol plastik daur ulang (rPET) dipadukan dengan aksen kain perca motif batik lokal Malang.",
+                price: 45000,
+                rating: 4.8,
+                specs: "35 cm x 40 cm (Muat Laptop 14 inch)",
+                colors: ["#2D5A27", "#C86D51", "#333333"],
+                image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=600"
+            },
+            {
+                id: 2,
+                name: "Slingbag Synthetic Minimalis",
+                category: "sling",
+                bahanType: "imitasi",
+                bahanLabel: "Kulit Imitasi",
+                materialStory: "Bahan 100% Premium Synthetic Vegan Leather tahan air, anti kusam, dan ramah lingkungan tanpa olahan kulit hewan.",
+                price: 85000,
+                rating: 4.9,
+                specs: "22 cm x 15 cm x 6 cm",
+                colors: ["#8B4513", "#000000", "#D2B48C"],
+                image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&q=80&w=600"
+            },
+            {
+                id: 3,
+                name: "Ransel Casual Eco Canvas",
+                category: "ransel",
+                bahanType: "daur-ulang",
+                bahanLabel: "Daur Ulang",
+                materialStory: "Menggunakan kain kanvas daur ulang dari limbah tekstil pabrik yang diproses kembali menjadi serat kuat & awet.",
+                price: 135000,
+                rating: 4.7,
+                specs: "40 cm x 30 cm x 14 cm (Kompartemen Laptop 15.6\")",
+                colors: ["#4A7C59", "#2B2D42"],
+                image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=600"
+            },
+            {
+                id: 4,
+                name: "Handbag Elegant Vegan Leather",
+                category: "clutch",
+                bahanType: "imitasi",
+                bahanLabel: "Kulit Imitasi",
+                materialStory: "Kulit sintetis tekstur jeruk berkualitas tinggi dengan jahitan presisi tinggi buatan tangan pengrajin Malang.",
+                price: 110000,
+                rating: 5.0,
+                specs: "26 cm x 18 cm x 8 cm",
+                colors: ["#C86D51", "#000000"],
+                image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=600"
+            },
+            {
+                id: 5,
+                name: "Tote Bag Upcycled Spanduk",
+                category: "tote",
+                bahanType: "daur-ulang",
+                bahanLabel: "Daur Ulang",
+                materialStory: "Tas unik ramah lingkungan berbahan spanduk bekas pilihan yang telah dibersihkan & diolah menjadi tote art penuh keunikan.",
+                price: 55000,
+                rating: 4.6,
+                specs: "38 cm x 42 cm",
+                colors: ["#4A7C59", "#E63946"],
+                image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=600"
+            },
+            {
+                id: 6,
+                name: "Clutch Mini Synthetic Pouch",
+                category: "clutch",
+                bahanType: "imitasi",
+                bahanLabel: "Kulit Imitasi",
+                materialStory: "Kulit sintestis lembut multifungsi cocok untuk tempat makeup, dompet, atau pelengkap gaya saat kondangan.",
+                price: 49000,
+                rating: 4.8,
+                specs: "20 cm x 12 cm",
+                colors: ["#D2B48C", "#000000", "#C86D51"],
+                image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&q=80&w=600"
+            },
+            {
+                id: 7,
+                name: "Ransel Mini Synthetic Cute",
+                category: "ransel",
+                bahanType: "imitasi",
+                bahanLabel: "Kulit Imitasi",
+                materialStory: "Kulit imitasi sintetis grade A tahan gesekan dengan desain mungil trendi favorit mahasiswa Malang.",
+                price: 120000,
+                rating: 4.9,
+                specs: "28 cm x 22 cm x 10 cm",
+                colors: ["#2D5A27", "#8B4513"],
+                image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&q=80&w=600"
+            },
+            {
+                id: 8,
+                name: "Slingbag Recycled Denim Casual",
+                category: "sling",
+                bahanType: "daur-ulang",
+                bahanLabel: "Daur Ulang",
+                materialStory: "Diolah dari celana jeans denim tak terpakai, memberikan gaya vintage kasual dan 100% tahan lama.",
+                price: 78000,
+                rating: 4.7,
+                specs: "24 cm x 18 cm x 5 cm",
+                colors: ["#1D3557", "#457B9D"],
+                image: "https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?auto=format&fit=crop&q=80&w=600"
+            }
+        ];
+
+        // STATE MANAGEMENT
+        let cart = [];
+        let currentBahanFilter = 'all';
+
+        // INIT ON LOAD
+        window.onload = function() {
+            renderProducts(products);
+        };
+
+        // SCROLL HELPER
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // TOGGLE MOBILE MENU
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // RENDER PRODUCTS
+        function renderProducts(items) {
+            const grid = document.getElementById('productGrid');
+            const empty = document.getElementById('emptyState');
+
+            grid.innerHTML = '';
+
+            if (items.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            } else {
+                empty.classList.add('hidden');
+            }
+
+            items.forEach(product => {
+                const badgeColor = product.bahanType === 'daur-ulang' ? 'bg-sage-700' : 'bg-terracotta-500';
+                
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 border border-gray-100 flex flex-col justify-between group";
+                card.innerHTML = `
+                    <div>
+                        <div class="relative overflow-hidden h-52 bg-gray-100">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 left-3 text-[10px] font-extrabold px-2.5 py-1 rounded-full text-white ${badgeColor} shadow-md uppercase tracking-wider">
+                                ${product.bahanLabel}
+                            </span>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">${product.category}</span>
+                                <div class="flex items-center text-xs text-yellow-400">
+                                    <i class="fas fa-star mr-1"></i>
+                                    <span class="font-bold text-gray-700">${product.rating}</span>
+                                </div>
+                            </div>
+                            <h3 class="font-bold text-gray-900 text-base mb-1 line-clamp-1">${product.name}</h3>
+                            <p class="text-xs text-gray-500 line-clamp-2 mb-3">${product.materialStory}</p>
+                            <p class="text-lg font-extrabold text-terracotta-500">Rp ${product.price.toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+                    <div class="px-5 pb-5 pt-0 grid grid-cols-2 gap-2">
+                        <button onclick="openProductModal(${product.id})" class="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition">
+                            Detail
+                        </button>
+                        <button onclick="addToCart(${product.id})" class="w-full py-2 bg-sage-700 hover:bg-sage-900 text-white text-xs font-semibold rounded-xl transition shadow-sm flex items-center justify-center gap-1">
+                            <i class="fas fa-plus text-[10px]"></i> Cart
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // FILTER & SORTING LOGIC
+        function setFilterBahan(type) {
+            currentBahanFilter = type;
+            
+            // update button active states
+            document.querySelectorAll('.filter-btn-bahan').forEach(btn => {
+                btn.className = "filter-btn-bahan px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-gray-700 hover:bg-sage-100 transition border border-gray-200";
+            });
+            document.getElementById(`btn-bahan-${type}`).className = "filter-btn-bahan px-4 py-1.5 rounded-full text-xs font-semibold bg-sage-700 text-white shadow-sm";
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            let filtered = [...products];
+
+            // Bahan Filter
+            if (currentBahanFilter !== 'all') {
+                filtered = filtered.filter(p => p.bahanType === currentBahanFilter);
+            }
+
+            // Jenis Filter
+            const jenisVal = document.getElementById('selectJenis').value;
+            if (jenisVal !== 'all') {
+                filtered = filtered.filter(p => p.category === jenisVal);
+            }
+
+            // Search Keyword
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (query) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(query) || p.materialStory.toLowerCase().includes(query));
+            }
+
+            // Sorting
+            const sortVal = document.getElementById('selectSort').value;
+            if (sortVal === 'low-high') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (sortVal === 'high-low') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sortVal === 'rating') {
+                filtered.sort((a, b) => b.rating - a.rating);
+            }
+
+            renderProducts(filtered);
+        }
+
+        function filterProducts() {
+            applyFilters();
+        }
+
+        function filterProductsMobile() {
+            const query = document.getElementById('searchInputMobile').value;
+            document.getElementById('searchInput').value = query;
+            applyFilters();
+        }
+
+        // MODAL PRODUCT DETAIL
+        function openProductModal(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+
+            document.getElementById('modalImg').src = product.image;
+            document.getElementById('modalTitle').textContent = product.name;
+            document.getElementById('modalPrice').textContent = `Rp ${product.price.toLocaleString('id-ID')}`;
+            document.getElementById('modalCategory').textContent = product.category;
+            document.getElementById('modalMaterialStory').textContent = product.materialStory;
+            document.getElementById('modalSpecs').textContent = product.specs;
+
+            const badge = document.getElementById('modalBadge');
+            badge.textContent = product.bahanLabel;
+            badge.className = `absolute top-4 left-4 text-xs font-bold px-3 py-1 rounded-full text-white ${product.bahanType === 'daur-ulang' ? 'bg-sage-700' : 'bg-terracotta-500'}`;
+
+            // Rating Stars
+            const ratingContainer = document.getElementById('modalRating');
+            ratingContainer.innerHTML = `<i class="fas fa-star"></i> <span class="font-bold text-gray-800 ml-1">${product.rating}</span>`;
+
+            // Colors
+            const colorsContainer = document.getElementById('modalColors');
+            colorsContainer.innerHTML = '';
+            product.colors.forEach(hex => {
+                const circle = document.createElement('span');
+                circle.className = "w-5 h-5 rounded-full border border-gray-300 inline-block shadow-inner";
+                circle.style.backgroundColor = hex;
+                colorsContainer.appendChild(circle);
+            });
+
+            // Set Add to cart action
+            const btn = document.getElementById('modalAddToCartBtn');
+            btn.onclick = function() {
+                addToCart(product.id);
+                closeProductModal();
+            };
+
+            document.getElementById('productModal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.add('hidden');
+        }
+
+        // CART DRAWER LOGIC
+        function toggleCartDrawer() {
+            const overlay = document.getElementById('cartDrawerOverlay');
+            const drawer = document.getElementById('cartDrawer');
+
+            if (drawer.classList.contains('translate-x-full')) {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existing = cart.find(item => item.id === productId);
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+
+            updateCartUI();
+            showToast(`"${product.name}" ditambahkan ke keranjang!`);
+        }
+
+        function updateQty(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            }
+            updateCartUI();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(i => i.id !== productId);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartItemsContainer');
+            const badge = document.getElementById('cartBadge');
+            const subtotalEl = document.getElementById('cartSubtotal');
+            const totalEl = document.getElementById('cartTotal');
+
+            // Total Quantity Count
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            badge.textContent = totalCount;
+
+            // Render Items
+            container.innerHTML = '';
+            let grandTotal = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-400">
+                        <i class="fas fa-shopping-basket text-4xl mb-2"></i>
+                        <p class="text-sm">Keranjang Anda masih kosong</p>
+                    </div>
+                `;
+            } else {
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.qty;
+                    grandTotal += itemTotal;
+
+                    const cartItem = document.createElement('div');
+                    cartItem.className = "flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100";
+                    cartItem.innerHTML = `
+                        <img src="${item.image}" alt="${item.name}" class="w-14 h-14 object-cover rounded-lg">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-bold text-gray-800 truncate">${item.name}</h4>
+                            <p class="text-xs text-terracotta-500 font-semibold mt-0.5">Rp ${item.price.toLocaleString('id-ID')}</p>
+                            <div class="flex items-center gap-2 mt-2">
+                                <button onclick="updateQty(${item.id}, -1)" class="w-5 h-5 bg-white border border-gray-300 rounded flex items-center justify-center text-xs text-gray-600 font-bold hover:bg-gray-100">-</button>
+                                <span class="text-xs font-bold text-gray-800">${item.qty}</span>
+                                <button onclick="updateQty(${item.id}, 1)" class="w-5 h-5 bg-white border border-gray-300 rounded flex items-center justify-center text-xs text-gray-600 font-bold hover:bg-gray-100">+</button>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button onclick="removeFromCart(${item.id})" class="text-gray-400 hover:text-red-500 text-xs mb-2">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                            <p class="text-xs font-bold text-gray-900">Rp ${itemTotal.toLocaleString('id-ID')}</p>
+                        </div>
+                    `;
+                    container.appendChild(cartItem);
+                });
+            }
+
+            subtotalEl.textContent = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+            totalEl.textContent = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+        }
+
+        // WHATSAPP CHECKOUT INTEGRATION
+        function handleCheckout(e) {
+            e.preventDefault();
+
+            if (cart.length === 0) {
+                alert("Keranjang belanja Anda masih kosong! Silakan pilih tas terlebih dahulu.");
+                return;
+            }
+
+            const name = document.getElementById('custName').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+
+            if (!name || !address) {
+                alert("Mohon lengkapi Nama dan Alamat Pengiriman.");
+                return;
+            }
+
+            // Admin Whatsapp (Nomor Malang EcoKarsa Demo)
+            const waNumber = "6281234567890";
+
+            let itemDetails = "";
+            let grandTotal = 0;
+
+            cart.forEach((item, index) => {
+                const sub = item.price * item.qty;
+                grandTotal += sub;
+                itemDetails += `${index + 1}. *${item.name}*\n   Bahan: ${item.bahanLabel}\n   Qty: ${item.qty} x Rp ${item.price.toLocaleString('id-ID')} = Rp ${sub.toLocaleString('id-ID')}\n`;
+            });
+
+            const text = `Halo Admin *EcoKarsa Malang*, saya mau pesan tas ramah lingkungan:\n\n` +
+                `*DATA PEMESAN:*\n` +
+                `👤 Nama: ${name}\n` +
+                `📍 Alamat: ${address}\n\n` +
+                `*RINCIAN PESANAN TAS:*\n${itemDetails}\n` +
+                `💰 *TOTAL ITEM:* Rp ${grandTotal.toLocaleString('id-ID')}\n\n` +
+                `Mohon diinfokan total beserta estimasi ongkir dari Malang. Terima kasih! 🌿`;
+
+            const encodedText = encodeURIComponent(text);
+            const waUrl = `https://wa.me/${waNumber}?text=${encodedText}`;
+
+            window.open(waUrl, '_blank');
+        }
+
+        // TOAST NOTIFICATION
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.textContent = msg;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
